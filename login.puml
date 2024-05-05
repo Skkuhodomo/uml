@@ -1,0 +1,60 @@
+@startuml user
+
+box Front #yellow
+participant "Browser" as B
+box Back #lightgreen
+participant "Server" as S
+box
+participant "DB" as D
+participant "Redis" as R
+
+group 회원가입
+    autonumber
+    B -> S : Signup Request
+        opt user_name == null || email==null || password == null
+        S --> B: exception 잘못된 요청
+        end
+        opt user_name|| email || password 형식 위배
+        S --> B: exception 잘못된 요청
+        end
+    S -> S : password encoded
+    S -> D : user_name, email, encoded password, user_role = USER 저장
+    S --> B: Response(/portal/login )
+    end
+
+group 회원탈퇴
+    autonumber
+    B -> S: Signout Request
+    S -> D: users.is_deleted = true
+    D -> D: 삭제 처리 (DELETED)
+    S -> R: userId를 통해 refresh 토큰 삭제
+    S -->B: response(쿠키 제거)
+end
+
+group 로그인
+    autonumber
+    B -> S : Login Request
+    S -> D : email, password 조회
+        opt non-existent email
+        S --> B: non-found exception
+        end
+        opt password 불일치
+        S --> B: exception 잘못된 요청
+        end
+    D --> S: User Information(user_id, user_name, user_role)
+    S -> S : access token, refresh token 발급
+    S -> R : refresh token 적재
+    S --> B: response(access token, refresh token)
+    B -> B : 쿠키에 적재
+end
+
+group 로그아웃
+    autonumber
+    B -> S: Logout Request
+    S -> R: refresh 토큰 제거
+    S --> B: response(쿠키 제거)
+
+
+end
+
+@end

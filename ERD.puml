@@ -1,0 +1,43 @@
+@startuml erd
+
+
+Entity user {
+  + user_id : INT (PK)
+  user_name : VARCHAR
+  email : VARCHAR
+  password : VARCHAR
+  user_role : VARCHAR
+  is_deleted : BOOLEAN
+}
+
+
+
+
+
+
+Entity post {
+  + post_id : INT (PK)
+  title : VARCHAR
+  content : VARCHAR
+  created_at : DATETIME
+  updated_at : DATETIME
+  user_id : INT
+}
+
+Entity comment {
+  + comment_id : INT (PK)
+  parent_id : INT
+  content : VARCHAR
+  created_at : DATETIME
+  updated_at : DATETIME
+  user_id : INT
+  post_id : INT
+}
+
+
+user ||--o{ post : Creates
+user ||--o{ comment : Writes
+post ||--o{ comment : Has
+comment ||--o{ comment
+
+@end
