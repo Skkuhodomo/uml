@@ -1,4 +1,4 @@
-# Intro of UML
+#  UML
 
 ### UML의 종류 
  - **클래스 다이어그램**
